@@ -13,7 +13,7 @@ export default function LoginPage() {
       const res = await api.post("/auth/login", form);
       localStorage.setItem("token", res.data.token);
       router.push("/events");
-    } catch (err) {
+    } catch (err:any) {
       alert(err.response?.data?.message || "Login failed");
     }
   };

@@ -13,7 +13,7 @@ export default function RegisterPage() {
       await api.post("/auth/register", form);
       alert("Registered successfully!");
       router.push("/");
-    } catch (err) {
+    } catch (err:any) {
       alert(err.response?.data?.message || "Registration failed");
     }
   };

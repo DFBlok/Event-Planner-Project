@@ -12,13 +12,13 @@ export default function CreateEventPage() {
   });
   const router = useRouter();
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e:any) => {
     e.preventDefault();
     try {
       await api.post("/events", form);
       alert("Event created!");
       router.push("/events");
-    } catch (err) {
+    } catch (err:any) {
       alert(err.response?.data?.message || "Failed to create event");
     }
   };
