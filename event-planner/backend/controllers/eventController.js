@@ -27,7 +27,7 @@ export const createEvent = async (req, res) => {
 };
 
 //add guest
-export const addGuest = async (req, res) => {
+/* export const addGuest = async (req, res) => {
   try{
     const {eventId} = req.params;
     const {name, email} = req.body;
@@ -41,7 +41,7 @@ export const addGuest = async (req, res) => {
   catch(err){
     res.status(500).json({message: "Error adding guest"});
   }
-};
+}; */
 
 //Send Invitations
 export const sendInvitations = async (req, res) =>{
@@ -49,6 +49,8 @@ export const sendInvitations = async (req, res) =>{
     const {eventId} = req.params;
     const event = await Event.findById(eventId);
     if(!event) return res.status(404).json({message: "Event not Found!"});
+    if (!event.guests || event.guests.length === 0)
+      return res.status(400).json({ message: "No guests to invite" });
 
     const transporter = nodemailer.createTransport({
       service: "gmail",
@@ -58,8 +60,8 @@ export const sendInvitations = async (req, res) =>{
       },
     });
 
-    for (const guest of event.guests){
-      const inviteLink = `http://localhost:5173/invite/${event._id}?access=${event.eventPassword}`;
+    /* for (const guest of event.guests){
+      const inviteLink = `http://localhost:5000/invite/${event._id}?access=${event.eventPassword}`;
       const mailOptions = {
         from: process.env.EMAIL_USER,
         to: guest.email,
@@ -76,6 +78,29 @@ export const sendInvitations = async (req, res) =>{
   }catch (err){
     console.error(err);
     res.status(500).json({message: "Error sending Invitation"});
+  }
+}; */
+// Send email to each guest
+    const sendPromises = event.guests.map((guest) => {
+      const mailOptions = {
+        from: `"Event Planner" <${process.env.EMAIL_USER}>`,
+        to: guest.email,
+        subject: `You're invited: ${event.name}`,
+        text: `Hi ${guest.name},\n\nYou're invited to ${event.name} at ${event.location} on ${event.date}.\n\nEvent Password: ${event.eventPassword || "N/A"}\n\nSee you there!`,
+      };
+      return transporter.sendMail(mailOptions);
+    });
+
+    await Promise.all(sendPromises);
+
+    // Mark guests as invited
+    event.guests.forEach((guest) => (guest.invited = true));
+    await event.save();
+
+    res.json({ message: "Invitations sent successfully!" });
+  } catch (error) {
+    console.error("sendInvitations error:", error);
+    res.status(500).json({ message: "Error sending invitations", error: error.message });
   }
 };
 

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { type } from "os";
+//import { type } from "os";
 
 const guestSchema = new mongoose.Schema({
   name: {type: String, required: true},
@@ -14,7 +14,7 @@ const eventSchema = new mongoose.Schema({
   description: { type: String },
   eventPassword: { type: String  },
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
-  guest: [guestSchema],
+  guests: [guestSchema],
 });
 
 export default mongoose.model("Event", eventSchema);

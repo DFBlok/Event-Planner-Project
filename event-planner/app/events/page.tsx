@@ -1,6 +1,7 @@
 "use client";
 import { useQuery } from "@tanstack/react-query";
 import api from "@/lib/axios";
+import Link from "next/link";
 
 export default function EventsPage() {
   const { data, isLoading, error } = useQuery({
@@ -26,6 +27,9 @@ export default function EventsPage() {
             <strong>{ev.name}</strong> — {ev.date} <br />
             📍 {ev.location}
             <p className="text-sm mt-1">{ev.description}</p>
+            <Link href={`/events/${ev._id}/guests`} className="text-blue-600 mt-2 inline-block">
+            Manage Guest
+            </Link>
           </li>
         ))}
       </ul>
